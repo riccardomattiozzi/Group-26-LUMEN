@@ -54,7 +54,7 @@ export function CompetitorPositioningChart() {
       <h3 className="card-title">LUMEN vs. competitor price bands</h3>
       <p className="card-subtitle">
         Real price ranges across channel/format from the data room, current
-        LUMEN price marked in green.
+        LUMEN price marked in blue.
       </p>
       <div
         className="mt-4 h-56"

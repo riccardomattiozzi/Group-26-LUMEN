@@ -42,19 +42,19 @@ export default function Home() {
   return (
     <div className="min-h-full">
       <Navbar />
-      <main className="mx-auto w-full max-w-7xl space-y-6 px-4 pb-16 sm:px-6 lg:px-8">
-        {/* 01 — The decision: pure framing, no controls or numbers yet. */}
+      <main className="mx-auto w-full max-w-7xl space-y-7 px-4 pb-16 sm:px-6 lg:px-8">
+        {/* The decision this screen supports, before any control or number. */}
         <DecisionFraming />
 
         <div className="grid grid-cols-1 gap-5 md:grid-cols-[17.5rem_minmax(0,1fr)] lg:grid-cols-[20rem_minmax(0,1fr)] lg:gap-8">
-          {/* 02 — Build the scenario. Sticky on wide screens so the
-              controls and the numbers they move stay on screen together
-              through every later section. */}
+          {/* Scenario inputs. Sticky on wide screens so the controls and
+              the numbers they move stay on screen together through every
+              later section. */}
           <aside
             aria-label="Scenario assumptions"
             className="h-fit overscroll-contain md:sticky md:top-[calc(var(--nav-h)+1rem)] md:max-h-[calc(100dvh-var(--nav-h)-2rem)] md:overflow-y-auto"
           >
-            <SectionHeading number="02" title="Build the scenario" question="What assumptions are we making?" />
+            <SectionHeading title="Scenario inputs" />
             <div className="card inspector">
               <ScenarioPresets />
               <PriceSlider />
@@ -65,43 +65,30 @@ export default function Home() {
           </aside>
 
           <div className="@container min-w-0 space-y-8">
-            {/* 03 — See the business impact. */}
+            {/* Business impact. */}
             <div className="space-y-5">
-              <SectionHeading
-                number="03"
-                title="See the business impact"
-                question="What happens financially in this scenario?"
-              />
+              <SectionHeading title="Business impact" />
               <RecommendationBox />
               <KpiRow />
             </div>
 
-            {/* 04 — Understand the strategic trade-off. */}
+            {/* The CFO/CMO trade-off. */}
             <div className="space-y-5">
-              <SectionHeading
-                number="04"
-                title="Understand the strategic trade-off"
-                question="Why isn't this simply the highest-margin or highest-volume choice?"
-              />
+              <SectionHeading title="Strategic trade-off" />
               <TradeoffMatrix />
             </div>
 
-            {/* 05 — Stress test the decision. Supporting evidence, not the
-                headline — kept visually quieter than 03/04. */}
+            {/* Stress test. Supporting evidence, not the headline. */}
             <div className="space-y-5">
-              <SectionHeading
-                number="05"
-                title="Stress test the decision"
-                question="How robust is this if our one uncertain assumption is wrong?"
-              />
+              <SectionHeading title="Stress test" />
               <StressTest />
               <ScenarioComparison />
             </div>
 
-            {/* 06 — Review the evidence: detailed analysis, tabbed so it
-                stays out of the way until someone asks for it. */}
+            {/* Evidence: detailed analysis, tabbed so it stays out of the
+                way until someone asks for it. */}
             <div className="space-y-5">
-              <SectionHeading number="06" title="Review the evidence" />
+              <SectionHeading title="Evidence" />
               <Tabs tabs={TABS}>
                 <TabPanel id="price">
                   <VanWestendorpChart />
@@ -139,7 +126,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* 07 — Make the recommendation: the close of the journey. */}
+        {/* Recommendation summary: the close of the page. */}
         <RecommendationRecap />
       </main>
     </div>

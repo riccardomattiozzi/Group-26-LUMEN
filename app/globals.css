@@ -9,60 +9,59 @@
    var() there like any other CSS value, so the charts follow light and dark
    mode with the rest of the page and nothing has to be kept in sync by hand.
 
-   Brand palette — "Nordic luminous energy": a warm ivory/bone surface, deep
-   charcoal-forest ink, a botanical-lime accent for the current scenario and
-   the compromise position, mineral eucalyptus for the CFO (financial
-   efficiency) side of every trade-off visual, and muted sunlight amber for
-   the CMO (brand & growth) side — so the same two hues mean "CFO" and
-   "CMO" everywhere: preset chips, score bars, the spectrum, the channel
-   legend, every chart series. Warning and danger are kept visibly distinct
-   from the CMO amber (more red/terracotta) so a stress-test or
-   extrapolation notice never reads as a brand color. Text never wears a
-   series color — it uses the ink tokens, all ≥ 4.5:1 on their surface.
+   Palette — an analyst's workbench: cool neutral greys with no warm tint,
+   one ledger blue for the current scenario, the compromise position and
+   every interactive control, teal for the CFO (financial efficiency) side
+   of every trade-off visual and amber for the CMO (brand & growth) side —
+   so the same two hues mean "CFO" and "CMO" everywhere: preset chips,
+   score bars, the spectrum, the channel legend, every chart series. The
+   four series hues pass the dataviz palette validator on every pair, in
+   both modes (colour-blind separation, lightness band, chroma floor,
+   contrast). Warning and danger sit on the red side of orange so a
+   stress-test or extrapolation notice never reads as the CMO amber. Text
+   never wears a series color — it uses the ink tokens, all ≥ 4.5:1 on
+   their surface. Surfaces are separated by 1px lines, not soft shadows.
    ------------------------------------------------------------------------ */
 :root {
   color-scheme: light dark;
 
-  --background: #f6f2e9;
-  --surface: #fffdf8;
-  --surface-2: rgba(90, 84, 64, 0.07);
+  --background: #f4f5f7;
+  --surface: #ffffff;
+  --surface-2: rgba(20, 30, 50, 0.035);
   --elevated: #ffffff;
   --thumb: #ffffff;
-  --material: rgba(246, 242, 233, 0.74);
-  --fill: rgba(90, 84, 64, 0.09);
-  --fill-strong: rgba(90, 84, 64, 0.16);
+  --material: #ffffff;
+  --fill: rgba(20, 30, 50, 0.06);
+  --fill-strong: rgba(20, 30, 50, 0.12);
 
-  --foreground: #1c2119;
-  --foreground-soft: #47503f;
-  --foreground-faint: #6d6852;
-  --line: #ddd4bf;
-  --line-soft: #ece5d3;
+  --foreground: #161a20;
+  --foreground-soft: #3b4350;
+  --foreground-faint: #5f6875;
+  --line: #dde1e6;
+  --line-soft: #eaedf0;
 
-  --accent: #8bbf3a;
-  --accent-ink: #4c6d1f;
-  --accent-soft: rgba(139, 191, 58, 0.15);
-  --cfo: #4b998a;
-  --cfo-soft: rgba(75, 153, 138, 0.14);
-  --cmo: #c1863d;
-  --cmo-soft: rgba(193, 134, 61, 0.16);
-  --chart-4: #7c87a8;
-  --chart-neutral: #b7ac95;
-  --chart-grid: #ece5d3;
+  --accent: #2b59c3;
+  --accent-ink: #1f4396;
+  --accent-soft: rgba(43, 89, 195, 0.1);
+  --cfo: #0d9488;
+  --cfo-soft: rgba(13, 148, 136, 0.12);
+  --cmo: #b7791f;
+  --cmo-soft: rgba(183, 121, 31, 0.14);
+  --chart-4: #a855f7;
+  --chart-neutral: #aeb4bf;
+  --chart-grid: #eaedf0;
 
-  --warning: #a8672f;
-  --warning-ink: #7a4a20;
-  --warning-soft: rgba(168, 103, 47, 0.14);
-  --danger: #b8452e;
-  --danger-ink: #8a3320;
-  --danger-soft: rgba(184, 69, 46, 0.12);
+  --warning: #c2410c;
+  --warning-ink: #9a3412;
+  --warning-soft: rgba(194, 65, 12, 0.1);
+  --danger: #b42318;
+  --danger-ink: #912018;
+  --danger-soft: rgba(180, 35, 24, 0.09);
 
-  --shadow-card: 0 0 0 0.5px rgba(40, 32, 12, 0.05), 0 1px 2px rgba(40, 32, 12, 0.04),
-    0 8px 24px -12px rgba(40, 32, 12, 0.12);
-  --shadow-raised: 0 0 0 0.5px rgba(40, 32, 12, 0.05), 0 3px 8px rgba(40, 32, 12, 0.13),
-    0 3px 1px rgba(40, 32, 12, 0.05);
-  --shadow-float: 0 0 0 0.5px rgba(40, 32, 12, 0.07), 0 12px 32px -8px rgba(40, 32, 12, 0.22);
-  --shadow-knob: 0 0 0 0.5px rgba(40, 32, 12, 0.05), 0 3px 8px rgba(40, 32, 12, 0.16),
-    0 3px 1px rgba(40, 32, 12, 0.06);
+  --shadow-card: 0 0 0 1px var(--line);
+  --shadow-raised: 0 0 0 1px var(--line), 0 1px 2px rgba(16, 24, 40, 0.08);
+  --shadow-float: 0 0 0 1px var(--line), 0 4px 8px rgba(16, 24, 40, 0.08);
+  --shadow-knob: 0 0 0 1px rgba(16, 24, 40, 0.16), 0 1px 2px rgba(16, 24, 40, 0.12);
 
   /* A critically damped spring (damping 1.0, response 0.35 s) sampled into
      linear(). No overshoot: nothing here is thrown, so nothing bounces. */
@@ -73,47 +72,48 @@
   --ease-press: cubic-bezier(0.2, 0.8, 0.2, 1);
 
   --nav-h: 3.25rem;
-  --knob-size: 1.5rem;
+  --knob-size: 1.125rem;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0f120e;
-    --surface: #1a1e17;
-    --surface-2: rgba(200, 194, 170, 0.1);
-    --elevated: #232821;
-    --thumb: #4a5040;
-    --material: rgba(15, 18, 14, 0.74);
-    --fill: rgba(200, 194, 170, 0.14);
-    --fill-strong: rgba(200, 194, 170, 0.22);
+    --background: #0e1014;
+    --surface: #161a20;
+    --surface-2: rgba(200, 210, 225, 0.05);
+    --elevated: #1d2129;
+    --thumb: #2c323c;
+    --material: #161a20;
+    --fill: rgba(200, 210, 225, 0.08);
+    --fill-strong: rgba(200, 210, 225, 0.16);
 
-    --foreground: #f3efe3;
-    --foreground-soft: #cbc6b3;
-    --foreground-faint: #98937f;
-    --line: #383e32;
-    --line-soft: #262b21;
+    --foreground: #eceef2;
+    --foreground-soft: #c2c8d1;
+    --foreground-faint: #8e96a3;
+    --line: #2a2f37;
+    --line-soft: #20242b;
 
-    --accent: #9ed94a;
-    --accent-ink: #b9ea72;
-    --accent-soft: rgba(158, 217, 74, 0.18);
-    --cfo: #62b3a2;
-    --cfo-soft: rgba(98, 179, 162, 0.2);
-    --cmo: #d9a05c;
-    --cmo-soft: rgba(217, 160, 92, 0.18);
-    --chart-4: #98a3c4;
-    --chart-neutral: #6c6754;
-    --chart-grid: #262b21;
+    --accent: #3a66d4;
+    --accent-ink: #93b1ff;
+    --accent-soft: rgba(90, 130, 240, 0.16);
+    --cfo: #149789;
+    --cfo-soft: rgba(20, 151, 137, 0.18);
+    --cmo: #b8872f;
+    --cmo-soft: rgba(184, 135, 47, 0.18);
+    --chart-4: #9d74f8;
+    --chart-neutral: #5b626e;
+    --chart-grid: #20242b;
 
-    --warning: #c9824c;
-    --warning-ink: #e3a878;
-    --warning-soft: rgba(201, 130, 76, 0.18);
-    --danger: #d97a5e;
-    --danger-ink: #ec9a82;
-    --danger-soft: rgba(217, 122, 94, 0.18);
+    --warning: #e0703a;
+    --warning-ink: #f59e6b;
+    --warning-soft: rgba(224, 112, 58, 0.16);
+    --danger: #e5534b;
+    --danger-ink: #f28b82;
+    --danger-soft: rgba(229, 83, 75, 0.16);
 
-    --shadow-card: 0 0 0 0.5px rgba(255, 250, 235, 0.06);
-    --shadow-raised: 0 3px 8px rgba(0, 0, 0, 0.34), 0 3px 1px rgba(0, 0, 0, 0.14);
-    --shadow-float: 0 0 0 0.5px rgba(255, 250, 235, 0.1), 0 12px 32px -8px rgba(0, 0, 0, 0.6);
+    --shadow-card: 0 0 0 1px var(--line);
+    --shadow-raised: 0 0 0 1px var(--line), 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-float: 0 0 0 1px var(--line), 0 4px 8px rgba(0, 0, 0, 0.4);
+    --shadow-knob: 0 0 0 1px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.4);
   }
 }
 
@@ -121,23 +121,22 @@
    border on every card instead of a shadow. */
 @media (prefers-contrast: more) {
   :root {
-    --foreground-soft: #1c2119;
-    --foreground-faint: #3a4032;
-    --line: #8f8770;
-    --line-soft: #a8a084;
-    --chart-grid: #beb69c;
-    --fill: rgba(90, 84, 64, 0.22);
-    --fill-strong: rgba(90, 84, 64, 0.38);
-    --shadow-card: 0 0 0 1px var(--line);
+    --foreground-soft: #161a20;
+    --foreground-faint: #333a45;
+    --line: #7d8591;
+    --line-soft: #a3aab4;
+    --chart-grid: #b9bfc8;
+    --fill: rgba(20, 30, 50, 0.16);
+    --fill-strong: rgba(20, 30, 50, 0.3);
   }
 }
 @media (prefers-contrast: more) and (prefers-color-scheme: dark) {
   :root {
-    --foreground-soft: #f3efe3;
-    --foreground-faint: #ddd6c3;
-    --line: #8f8770;
-    --line-soft: #625c48;
-    --chart-grid: #4d4a3b;
+    --foreground-soft: #eceef2;
+    --foreground-faint: #d3d8df;
+    --line: #7d8591;
+    --line-soft: #4f5661;
+    --chart-grid: #3f4550;
   }
 }
 
@@ -169,46 +168,55 @@
   --color-danger-soft: var(--danger-soft);
 }
 
-/* Manrope (loaded in app/layout.tsx as --font-lumen) first, the platform
-   typeface as a safety net if the font hasn't painted yet. Tracking and
-   leading are set per size — tight on large text, near zero on body,
-   slightly open on the smallest captions — never one letter-spacing for
-   every size. */
+/* IBM Plex Sans (loaded in app/layout.tsx as --font-lumen) first, the
+   platform typeface as a safety net if the font hasn't painted yet. Plex
+   is drawn for reports and data: open figures, true tabular numerals and
+   a steady rhythm at small sizes. It needs almost no tracking — a hair
+   tighter on the largest sizes, a hair open on the smallest captions. */
 @theme {
   --font-sans: var(--font-lumen), -apple-system, BlinkMacSystemFont, system-ui,
     "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
 
+  /* Small, consistent corners: controls 4–6px, panels 8px. The larger
+     utility radii are pulled down here so no component can drift back to
+     soft, pillowy cards. */
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.5rem;
+  --radius-2xl: 0.5rem;
+  --radius-3xl: 0.5rem;
+
   --text-2xs: 0.6875rem;
   --text-2xs--line-height: 1.3;
-  --text-2xs--letter-spacing: 0.006em;
+  --text-2xs--letter-spacing: 0.01em;
   --text-xs: 0.75rem;
   --text-xs--line-height: 1.34;
-  --text-xs--letter-spacing: 0em;
+  --text-xs--letter-spacing: 0.005em;
   --text-footnote: 0.8125rem;
   --text-footnote--line-height: 1.38;
-  --text-footnote--letter-spacing: -0.004em;
+  --text-footnote--letter-spacing: 0em;
   --text-sm: 0.875rem;
-  --text-sm--line-height: 1.43;
-  --text-sm--letter-spacing: -0.009em;
-  --text-base: 1rem;
+  --text-sm--line-height: 1.45;
+  --text-sm--letter-spacing: 0em;
+  --text-base: 0.9375rem;
   --text-base--line-height: 1.5;
-  --text-base--letter-spacing: -0.012em;
+  --text-base--letter-spacing: 0em;
   --text-lg: 1.0625rem;
-  --text-lg--line-height: 1.41;
-  --text-lg--letter-spacing: -0.016em;
+  --text-lg--line-height: 1.4;
+  --text-lg--letter-spacing: -0.005em;
   --text-xl: 1.25rem;
-  --text-xl--line-height: 1.25;
-  --text-xl--letter-spacing: -0.018em;
+  --text-xl--line-height: 1.3;
+  --text-xl--letter-spacing: -0.01em;
   --text-2xl: 1.5rem;
-  --text-2xl--line-height: 1.17;
-  --text-2xl--letter-spacing: -0.02em;
-  --text-3xl: 1.875rem;
-  --text-3xl--line-height: 1.13;
-  --text-3xl--letter-spacing: -0.022em;
-  --text-4xl: 2.25rem;
-  --text-4xl--line-height: 1.08;
-  --text-4xl--letter-spacing: -0.025em;
+  --text-2xl--line-height: 1.2;
+  --text-2xl--letter-spacing: -0.012em;
+  --text-3xl: 1.75rem;
+  --text-3xl--line-height: 1.15;
+  --text-3xl--letter-spacing: -0.015em;
+  --text-4xl: 2rem;
+  --text-4xl--line-height: 1.1;
+  --text-4xl--letter-spacing: -0.018em;
 }
 
 @layer base {
@@ -242,14 +250,14 @@
   /* ---- Surfaces ---------------------------------------------------------- */
   .card {
     background: var(--surface);
-    border-radius: 1.25rem;
+    border-radius: 0.5rem;
     box-shadow: var(--shadow-card);
   }
 
   .card-title {
-    font-size: 1.0625rem;
-    line-height: 1.3;
-    letter-spacing: -0.016em;
+    font-size: 0.9375rem;
+    line-height: 1.35;
+    letter-spacing: 0;
     font-weight: 600;
     color: var(--foreground);
     text-wrap: balance;
@@ -275,7 +283,7 @@
   }
 
   .callout {
-    border-radius: 0.875rem;
+    border-radius: 0.375rem;
     padding: 0.75rem 0.875rem;
     background: var(--surface-2);
     color: var(--foreground-soft);
@@ -303,28 +311,10 @@
   }
 
   /* ---- Chrome ------------------------------------------------------------ */
-  /* Translucent toolbar. Content scrolls underneath it; the hairline only
-     appears once something actually sits under the bar. */
+  /* Application bar: solid, with a single hairline under it. */
   .toolbar {
     background: var(--material);
-    -webkit-backdrop-filter: saturate(180%) blur(20px);
-    backdrop-filter: saturate(180%) blur(20px);
-    border-bottom: 1px solid transparent;
-    transition: border-color 200ms ease;
-  }
-  .toolbar[data-condensed="true"] {
-    border-bottom-color: color-mix(in srgb, var(--line) 70%, transparent);
-  }
-  .toolbar-title {
-    opacity: 0;
-    transform: translateY(4px);
-    transition:
-      opacity 200ms ease,
-      transform var(--duration-spring) var(--ease-spring);
-  }
-  .toolbar[data-condensed="true"] .toolbar-title {
-    opacity: 1;
-    transform: none;
+    border-bottom: 1px solid var(--line);
   }
 
   /* Press feedback lands on pointer-down, and is instant. */
@@ -342,11 +332,11 @@
   /* ---- Segmented control -------------------------------------------------- */
   .segmented {
     background: var(--fill);
-    border-radius: 0.75rem;
+    border-radius: 0.5rem;
   }
   .segmented-thumb {
     background: var(--thumb);
-    border-radius: 0.5625rem;
+    border-radius: 0.375rem;
     box-shadow: var(--shadow-raised);
     opacity: 0;
   }
@@ -450,14 +440,12 @@
     outline-offset: 2px;
   }
 
-  /* ---- Chart tooltip (a floating material, not a boxed border) ---------- */
+  /* ---- Chart tooltip: a solid panel with a hairline ring ---------------- */
   .chart-tooltip {
     min-width: 8rem;
-    border-radius: 0.75rem;
+    border-radius: 0.375rem;
     padding: 0.5rem 0.625rem;
-    background: color-mix(in srgb, var(--elevated) 86%, transparent);
-    -webkit-backdrop-filter: saturate(180%) blur(16px);
-    backdrop-filter: saturate(180%) blur(16px);
+    background: var(--elevated);
     box-shadow: var(--shadow-float);
     font-size: 0.75rem;
     line-height: 1.35;
@@ -557,7 +545,7 @@ input[type="range"]:focus-visible::-moz-range-thumb {
 /* Bigger knob and hit area under a finger. */
 @media (pointer: coarse) {
   :root {
-    --knob-size: 1.75rem;
+    --knob-size: 1.5rem;
   }
   input[type="range"] {
     height: 2.25rem;
@@ -574,9 +562,6 @@ input[type="range"]:focus-visible::-moz-range-thumb {
   }
   .segmented-thumb[data-animate="true"] {
     transition: opacity 160ms ease;
-  }
-  .toolbar-title {
-    transform: none;
   }
   .pressable:active {
     transform: none;
@@ -597,24 +582,3 @@ input[type="range"]:focus-visible::-moz-range-thumb {
   }
 }
 
-/* Reduced transparency: translucent layers turn solid. */
-@media (prefers-reduced-transparency: reduce) {
-  .toolbar {
-    background: var(--background);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
-  .chart-tooltip {
-    background: var(--elevated);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
-}
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .toolbar {
-    background: var(--background);
-  }
-  .chart-tooltip {
-    background: var(--elevated);
-  }
-}
