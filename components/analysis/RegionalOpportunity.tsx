@@ -3,10 +3,11 @@
 import { useScenario, useScenarioStore } from "@/lib/store";
 import { dataset, REGIONS } from "@/lib/engine/dataset";
 import { formatEuro } from "@/components/charts/format";
-import { CheckIcon } from "@/components/ui/icons";
+import { CheckIcon, WarningIcon } from "@/components/ui/icons";
 import { InfoTip } from "@/components/ui/InfoTip";
 import { FitnessMap } from "@/components/analysis/FitnessMap";
 import { SUPPORTED_FITNESS_CITIES, isSupportedFitnessCity } from "@/lib/fitness/cities";
+import { formatLocationCount, unrankedExplanation } from "@/lib/fitness/format";
 import { useFitnessOpportunity } from "@/lib/fitness/useFitnessOpportunity";
 import type { FitnessOpportunityResponse, FitnessTier } from "@/lib/fitness/types";
 import type { Region } from "@/lib/types";
@@ -16,6 +17,8 @@ const FITNESS_TIER_STYLE: Record<FitnessTier, string> = {
   MEDIUM: "bg-warning-soft text-warning-ink",
   LOW: "bg-fill text-foreground-soft",
 };
+
+type AvailableFitness = Extract<FitnessOpportunityResponse, { available: true }>;
 
 // One badge per row, each with its own hook call — Rules of Hooks means
 // this can't live inline inside the row-rendering .map() below.
@@ -32,6 +35,13 @@ function FitnessBadge({ region }: { region: Region }) {
   if (!result.available) {
     return <span className="text-2xs text-foreground-faint">Fitness data unavailable</span>;
   }
+  if (!result.ranked) {
+    return (
+      <span className="text-2xs text-foreground-faint" title={unrankedExplanation(result)}>
+        {formatLocationCount(result)} fitness locations · not ranked
+      </span>
+    );
+  }
 
   return (
     <span
@@ -47,6 +57,9 @@ function FitnessBadge({ region }: { region: Region }) {
 // loop over a dynamic array) so this stays valid under the Rules of Hooks.
 // Piggybacks on the same client-side cache as the per-row FitnessBadge
 // instances above, so it never causes an extra Places API round trip.
+//
+// Either says why cities aren't ranked (a capped count anywhere) or, only
+// when every count is complete, names the strongest selected city.
 function FitnessInsight({ selectedRegions }: { selectedRegions: Region[] }) {
   const berlin = useFitnessOpportunity("Berlin");
   const munich = useFitnessOpportunity("Munich");
@@ -62,9 +75,33 @@ function FitnessInsight({ selectedRegions }: { selectedRegions: Region[] }) {
     Frankfurt: frankfurt.result,
   } as const;
 
-  const topSelected = SUPPORTED_FITNESS_CITIES.filter((c) => selectedRegions.includes(c))
-    .map((c) => byCity[c])
-    .filter((r): r is Extract<FitnessOpportunityResponse, { available: true }> => Boolean(r?.available))
+  const available = SUPPORTED_FITNESS_CITIES.map((c) => byCity[c]).filter(
+    (r): r is AvailableFitness => Boolean(r?.available)
+  );
+
+  const cappedCities = SUPPORTED_FITNESS_CITIES.filter((c) =>
+    available.some((r) => r.cappedCities.includes(c))
+  );
+  if (cappedCities.length > 0) {
+    const { maxResultsPerSearch } = available[0];
+    return (
+      <p className="callout callout-warning mt-3 flex gap-2">
+        <WarningIcon className="mt-0.5 h-3.5 w-3.5 flex-none text-warning" />
+        <span>
+          <strong>Cities are not ranked on fitness density.</strong> Google
+          Places returns at most {maxResultsPerSearch} results per search, and
+          the counts for {cappedCities.join(", ")} hit that limit. A capped
+          count is only a lower bound: divided by population, capped counts
+          would rank cities by size, not by how many fitness locations they
+          have.
+        </span>
+      </p>
+    );
+  }
+
+  const topSelected = available
+    .filter((r) => selectedRegions.includes(r.city))
+    .flatMap((r) => (r.ranked ? [r] : []))
     .sort((a, b) => b.opportunityIndex - a.opportunityIndex)[0];
 
   if (!topSelected || topSelected.tier !== "HIGH") return null;
@@ -72,7 +109,8 @@ function FitnessInsight({ selectedRegions }: { selectedRegions: Region[] }) {
   return (
     <p className="callout mt-3">
       <strong>{topSelected.city}</strong> has an above-average fitness-location
-      density (opportunity index {topSelected.opportunityIndex.toFixed(2)}×),
+      density (opportunity index {topSelected.opportunityIndex.toFixed(2)}× the
+      average of the {topSelected.comparisonCityCount} cities compared),
       supporting its attractiveness as an initial target market — a
       directional market signal, not a demand forecast.
     </p>
@@ -140,7 +178,11 @@ export function RegionalOpportunity() {
           fitness-location density (gyms, fitness centers, sports clubs and
           activity locations per 100k inhabitants, relative to the average
           across the five supported cities). It is not an estimate of the
-          percentage of residents who exercise.
+          percentage of residents who exercise. Locations come from Google
+          Places in a circle the size of each city&apos;s area; populations are
+          Destatis figures for 31 Dec 2024. Google returns at most 20 places
+          per search, so a search that comes back full gives only a lower
+          bound. Cities are not ranked while any count is capped.
         </InfoTip>
       </h3>
       <p className="card-subtitle">

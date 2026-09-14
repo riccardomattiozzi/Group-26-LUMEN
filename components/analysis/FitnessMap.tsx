@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { colors } from "@/lib/theme";
 import { FITNESS_CITY_CONFIG, SUPPORTED_FITNESS_CITIES, type SupportedFitnessCity } from "@/lib/fitness/cities";
+import { formatLocationCount, unrankedShortReason } from "@/lib/fitness/format";
 import { useFitnessOpportunity } from "@/lib/fitness/useFitnessOpportunity";
 import type { FitnessOpportunityResponse, FitnessTier } from "@/lib/fitness/types";
 
@@ -53,7 +54,8 @@ function Pin({ city, selected, onToggle, onHover }: PinProps) {
   const { result } = useFitnessOpportunity(city);
   const config = FITNESS_CITY_CONFIG[city];
   const [x, y] = project(config.lat, config.lng);
-  const color = result?.available ? TIER_COLOR[result.tier] : colors.inkFaint;
+  const tier = result?.available && result.ranked ? result.tier : null;
+  const color = tier ? TIER_COLOR[tier] : colors.inkFaint;
 
   return (
     <g
@@ -74,7 +76,9 @@ function Pin({ city, selected, onToggle, onHover }: PinProps) {
         strokeWidth={selected ? 2 : 1.5}
         role="button"
         tabIndex={0}
-        aria-label={`${city}: ${result?.available ? `${result.tier} fitness opportunity` : "fitness data unavailable"}`}
+        aria-label={`${city}: ${
+          tier ? `${tier} fitness opportunity` : result?.available ? "not ranked" : "fitness data unavailable"
+        }`}
         onClick={() => onToggle(city)}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
@@ -99,13 +103,24 @@ function Pin({ city, selected, onToggle, onHover }: PinProps) {
 function TooltipContent({ city, result }: { city: SupportedFitnessCity; result: FitnessOpportunityResponse | null }) {
   if (!result) return <>Loading fitness data for {city}…</>;
   if (!result.available) return <>Fitness data unavailable for {city}.</>;
+  if (!result.ranked) {
+    return (
+      <>
+        <strong>{city}</strong> — not ranked
+        <br />
+        {formatLocationCount(result)} locations
+        <br />
+        {unrankedShortReason(result)}
+      </>
+    );
+  }
   return (
     <>
       <strong>{city}</strong> — {result.tier} opportunity
       <br />
       {result.locationCount} locations · {result.densityPer100k.toFixed(1)} per 100k
       <br />
-      {result.opportunityIndex.toFixed(2)}× the 5-city benchmark
+      {result.opportunityIndex.toFixed(2)}× the {result.comparisonCityCount}-city benchmark
     </>
   );
 }
@@ -134,6 +149,14 @@ export function FitnessMap({
     Cologne: cologne.result,
     Frankfurt: frankfurt.result,
   };
+  const anyRanked = SUPPORTED_FITNESS_CITIES.some((c) => {
+    const r = byCity[c];
+    return r?.available && r.ranked;
+  });
+  const anyUnranked = SUPPORTED_FITNESS_CITIES.some((c) => {
+    const r = byCity[c];
+    return r !== null && !(r.available && r.ranked);
+  });
 
   return (
     <div className="relative mt-2 mb-1 rounded-2xl bg-surface-2 p-3">
@@ -156,23 +179,34 @@ export function FitnessMap({
       </svg>
 
       <div className="mt-2 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-2xs text-foreground-faint">
-        <span className="inline-flex items-center gap-1">
-          <span aria-hidden className="h-2 w-2 rounded-full" style={{ backgroundColor: colors.accent }} />
-          HIGH
-        </span>
-        <span className="inline-flex items-center gap-1">
-          <span aria-hidden className="h-2 w-2 rounded-full" style={{ backgroundColor: colors.warning }} />
-          MEDIUM
-        </span>
-        <span className="inline-flex items-center gap-1">
-          <span aria-hidden className="h-2 w-2 rounded-full" style={{ backgroundColor: colors.neutral }} />
-          LOW
-        </span>
+        {/* Tier keys only mean something once at least one pin carries a tier. */}
+        {(anyRanked || !anyUnranked) && (
+          <>
+            <span className="inline-flex items-center gap-1">
+              <span aria-hidden className="h-2 w-2 rounded-full" style={{ backgroundColor: colors.accent }} />
+              HIGH
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <span aria-hidden className="h-2 w-2 rounded-full" style={{ backgroundColor: colors.warning }} />
+              MEDIUM
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <span aria-hidden className="h-2 w-2 rounded-full" style={{ backgroundColor: colors.neutral }} />
+              LOW
+            </span>
+          </>
+        )}
+        {anyUnranked && (
+          <span className="inline-flex items-center gap-1">
+            <span aria-hidden className="h-2 w-2 rounded-full" style={{ backgroundColor: colors.inkFaint }} />
+            Not ranked
+          </span>
+        )}
       </div>
 
       {hovered && (
         <div
-          className="chart-tooltip pointer-events-none absolute left-1/2 top-2 -translate-x-1/2 text-center"
+          className="chart-tooltip pointer-events-none absolute left-1/2 top-2 w-max max-w-[17rem] -translate-x-1/2 text-center"
           role="status"
         >
           <TooltipContent city={hovered} result={byCity[hovered]} />

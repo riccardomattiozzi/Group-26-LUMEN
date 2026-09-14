@@ -1,5 +1,6 @@
 import { FITNESS_CITY_CONFIG, type SupportedFitnessCity } from "@/lib/fitness/cities";
-import { FITNESS_PLACE_TYPES } from "@/lib/fitness/opportunity";
+import { FITNESS_PLACE_TYPES, PLACES_MAX_RESULTS_PER_SEARCH, isSearchCapped } from "@/lib/fitness/opportunity";
+import type { FitnessLocationSample } from "@/lib/fitness/types";
 
 // Places API (New) — Nearby Search. Field mask restricted to `places.id`
 // only: we only need place IDs to count and deduplicate locations, and
@@ -22,7 +23,7 @@ async function searchNearbyPlaceIds(
     },
     body: JSON.stringify({
       includedTypes: [type],
-      maxResultCount: 20,
+      maxResultCount: PLACES_MAX_RESULTS_PER_SEARCH,
       locationRestriction: {
         circle: {
           center: { latitude: center.lat, longitude: center.lng },
@@ -46,32 +47,32 @@ async function searchNearbyPlaceIds(
   return (data.places ?? []).map((p) => p.id).filter((id): id is string => Boolean(id));
 }
 
-// Counts unique fitness-related locations near a city's centroid, deduped
-// by place ID across every configured place type. Nearby Search (New) caps
-// each call at 20 results, so this is a bounded sample within the search
-// radius, not an exhaustive census of every gym in the city — see the
-// methodology note surfaced alongside the feature in the UI.
-export async function fetchFitnessLocationCount(
+// Counts unique fitness-related locations in a city's search circle,
+// deduped by place ID across every configured place type, and reports
+// which type searches came back full. Nearby Search (New) stops at 20
+// results per call, so a full search means the count is a lower bound,
+// not a census — the caller must not rank cities on it.
+//
+// Every type search has to succeed: a city missing one type's results
+// would be undercounted without anything showing it, so a partial failure
+// fails the whole city.
+export async function fetchFitnessLocationSample(
   city: SupportedFitnessCity,
   apiKey: string
-): Promise<number> {
+): Promise<FitnessLocationSample> {
   const config = FITNESS_CITY_CONFIG[city];
   const center = { lat: config.lat, lng: config.lng };
 
-  const settled = await Promise.allSettled(
-    FITNESS_PLACE_TYPES.map((type) => searchNearbyPlaceIds(type, center, config.radiusMeters, apiKey))
+  const results = await Promise.all(
+    FITNESS_PLACE_TYPES.map(async (type) => ({
+      type,
+      ids: await searchNearbyPlaceIds(type, center, config.radiusMeters, apiKey),
+    }))
   );
 
-  const allFailed = settled.every((s) => s.status === "rejected");
-  if (allFailed) {
-    throw new Error(`All Places API requests failed for ${city}`);
-  }
-
-  const uniqueIds = new Set<string>();
-  for (const outcome of settled) {
-    if (outcome.status === "fulfilled") {
-      for (const id of outcome.value) uniqueIds.add(id);
-    }
-  }
-  return uniqueIds.size;
+  const uniqueIds = new Set(results.flatMap((r) => r.ids));
+  return {
+    locationCount: uniqueIds.size,
+    cappedTypes: results.filter((r) => isSearchCapped(r.ids.length)).map((r) => r.type),
+  };
 }
