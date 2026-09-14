@@ -10,10 +10,8 @@ const MONTH_NAMES = [
   "July", "August", "September", "October", "November", "December",
 ];
 
-// The page's one headline. It leads by type size alone — the largest text
-// in the column — with the three decisions (price, channel, month) picked
-// out in the tint and repeated as scannable stat chips underneath, so a
-// viewer several meters away can read the call without the prose. "Why"
+// The page's one headline: the call in a single sentence, then the three
+// decisions (price, channel, month) as scannable figures underneath. "Why"
 // and the trade-off are both built from the same numbers already computed
 // by lib/recommendationEngine.ts — nothing here invents a conclusion.
 export function RecommendationBox() {
@@ -31,40 +29,22 @@ export function RecommendationBox() {
   return (
     <section
       aria-labelledby="recommendation-heading"
-      className="card relative overflow-hidden p-6 sm:p-8"
+      className="card p-5 sm:p-6"
     >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(120% 90% at 0% 0%, color-mix(in srgb, var(--accent) 11%, transparent), transparent 62%)",
-        }}
-      />
-      <div className="relative">
-        <p className="flex items-center gap-2 text-footnote font-semibold text-accent-ink">
-          <span aria-hidden className="h-2 w-2 rounded-full bg-accent" />
-          Recommended launch strategy for this scenario
-        </p>
+      <div>
+        <p className="eyebrow">Recommendation for this scenario</p>
         <h2
           id="recommendation-heading"
-          className="mt-3 max-w-3xl text-2xl font-semibold text-foreground text-balance @xl:text-3xl"
+          className="mt-1.5 max-w-3xl text-xl font-semibold text-foreground text-balance @xl:text-2xl"
         >
-          Launch at{" "}
-          <span className="text-accent-ink">{`€${recommendation.priceEur.toFixed(2)}`}</span>,
-          leading with{" "}
-          <span className="text-accent-ink">{recommendation.primaryChannel}</span>,
-          targeting{" "}
-          <span className="text-accent-ink">
-            {MONTH_NAMES[recommendation.launchMonth - 1]}
-          </span>
-          .
+          Launch at {`€${recommendation.priceEur.toFixed(2)}`}, leading with{" "}
+          {recommendation.primaryChannel}, targeting{" "}
+          {MONTH_NAMES[recommendation.launchMonth - 1]}.
         </h2>
 
-        {/* Price / channel / when as their own stats — the same three
-            decisions as the headline, sized to read from the back of a
-            room. */}
-        <div className="mt-5 grid grid-cols-3 gap-3 @xl:max-w-xl">
+        {/* Price / channel / when as their own figures — the same three
+            decisions as the headline, readable at a glance. */}
+        <div className="mt-4 grid grid-cols-3 divide-x divide-line-soft rounded-lg bg-surface-2 py-3 @xl:max-w-xl [&>div]:px-4">
           <div>
             <p className="eyebrow">Price</p>
             <p className="mt-1 text-xl font-semibold tabular-nums text-foreground">

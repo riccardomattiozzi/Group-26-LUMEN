@@ -10,11 +10,11 @@ const MONTH_NAMES = [
   "July", "August", "September", "October", "November", "December",
 ];
 
-// Step 07, the close of the guided journey: the same recommendation shown
-// up front in step 03 (so a viewer who only reads the top of the page
-// still gets it), restated here with the full context — trade-off and
-// risk — now that the reader has seen the economics, the CFO/CMO framing
-// and the stress test. Every figure is read from computeTradeoff() and
+// The close of the page: the same recommendation shown up front under
+// "Business impact" (so a viewer who only reads the top of the page still
+// gets it), restated here with the full context — trade-off and risk — now
+// that the reader has seen the economics, the CFO/CMO framing and the
+// stress test. Every figure is read from computeTradeoff() and
 // stressTestAssumption(); nothing is a new conclusion.
 export function RecommendationRecap() {
   const { inputs, outputs } = useScenario();
@@ -26,34 +26,20 @@ export function RecommendationRecap() {
   return (
     <section
       aria-labelledby="recap-heading"
-      className="card relative overflow-hidden p-6 sm:p-8"
+      className="card p-5 sm:p-6"
     >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(120% 90% at 100% 0%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 62%)",
-        }}
-      />
-      <div className="relative">
-        <SectionHeading number="07" title="Make the recommendation" />
-        <h2
-          id="recap-heading"
-          className="max-w-2xl text-xl font-semibold text-foreground text-balance sm:text-2xl"
+      <div>
+        <SectionHeading id="recap-heading" title="Recommendation summary" />
+        <p
+          className="max-w-2xl text-lg font-semibold text-foreground text-balance sm:text-xl"
         >
           Based on this scenario, LUMEN should launch at{" "}
-          <span className="text-accent-ink">{`€${recommendation.priceEur.toFixed(2)}`}</span>,
-          leading with{" "}
-          <span className="text-accent-ink">{recommendation.primaryChannel}</span>,
-          in{" "}
-          <span className="text-accent-ink">
-            {MONTH_NAMES[recommendation.launchMonth - 1]}
-          </span>
-          .
-        </h2>
+          {`€${recommendation.priceEur.toFixed(2)}`}, leading with{" "}
+          {recommendation.primaryChannel}, in{" "}
+          {MONTH_NAMES[recommendation.launchMonth - 1]}.
+        </p>
 
-        <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-3">
+        <div className="mt-5 grid grid-cols-1 gap-5 border-t border-line-soft pt-5 sm:grid-cols-3">
           <div>
             <p className="eyebrow">Why</p>
             <p className="mt-1.5 text-sm text-foreground-soft text-pretty">

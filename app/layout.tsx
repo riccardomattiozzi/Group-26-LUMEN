@@ -1,14 +1,15 @@
 import type { Metadata, Viewport } from "next";
-import { Manrope } from "next/font/google";
+import { IBM_Plex_Sans } from "next/font/google";
 import "./globals.css";
 
-// Manrope: a geometric, Scandinavian-feeling sans with clean tabular
-// numerals — the LUMEN brand typeface. Self-hosted by next/font (no
-// external request at runtime), exposed as a CSS variable that
-// app/globals.css layers in front of the system stack, so a failed font
-// load still renders legibly on the platform's own typeface.
-const manrope = Manrope({
+// IBM Plex Sans: a sober, report-grade sans with true tabular numerals —
+// built for tables, figures and dense labels, which is most of this page.
+// Self-hosted by next/font (no external request at runtime), exposed as a
+// CSS variable that app/globals.css layers in front of the system stack, so
+// a failed font load still renders legibly on the platform's own typeface.
+const plex = IBM_Plex_Sans({
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
   variable: "--font-lumen",
   display: "swap",
 });
@@ -16,16 +17,16 @@ const manrope = Manrope({
 export const metadata: Metadata = {
   title: "LUMEN — Germany Launch Simulator",
   description:
-    "Bright energy. Clear decisions. An interactive pricing and go-to-market simulator for LUMEN's German market entry.",
+    "An interactive pricing and go-to-market simulator for LUMEN's German market entry: price, channel mix and launch timing for Year 1.",
 };
 
 // Lets Safari and mobile browsers tint their own chrome to match the page.
-// These two mirror --background in app/globals.css: a <meta> tag can't read
+// These two mirror --material in app/globals.css: a <meta> tag can't read
 // a CSS variable, so they are the one place a color is repeated.
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f6f2e9" },
-    { media: "(prefers-color-scheme: dark)", color: "#0f120e" },
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#161a20" },
   ],
 };
 
@@ -35,7 +36,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`h-full antialiased ${manrope.variable}`}>
+    <html lang="en" className={`h-full antialiased ${plex.variable}`}>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );
