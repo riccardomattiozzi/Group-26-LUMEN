@@ -22,12 +22,19 @@ naming, file-ownership boundaries, and PR-per-module discipline were kept
 exactly as if four different people and tools had built it, specifically so
 the git history stays legible and reviewable the same way either way.
 
+That describes the four original modules. From pull request #11 onwards the
+teammates contributed in their own AI sessions, each logged under their own
+student ID — see "Who built what" in the README.
+
 ## Core Engine (`feature/core-engine`)
 
 The single most important decision here wasn't a prompt, it was a number we
 almost shipped wrong: the first version defaulted `marketShareCapturePct` to
-1%, which implied ~750,000 units/month for Germany in year one — nearly 10×
-LUMEN's entire current combined NL+DK+SE volume. Catching that required
+1%, which implies about 629,000 units/month for Germany in year one at the
+default scenario — nearly 10× (9.7×) LUMEN's entire current combined
+NL+DK+SE volume of about 65,000 units/month. (An earlier version of this
+note said ~750,000; rerunning the engine as it was first merged gives
+629,121, so the figure is corrected here.) Catching that required
 actually running the engine end-to-end and sanity-checking the output
 against a real anchor (current home-market volume from
 `historical_sales_weekly.csv`), not just checking that the code compiled.
@@ -80,8 +87,12 @@ Building them in changed what the tool says, not just how much it shows:
   consumers' own acceptable band at roughly €1.38–€1.97 — materially below
   the profit-maximising €2.19. That disagreement is now displayed rather
   than resolved silently.
-- Per-respondent thresholds (rather than segment averages) show a €2.39
-  price prices out 54% of the surveyed market outright.
+- Against each segment's average thresholds, €2.39 prices out Students &
+  Budget-Conscious and stretches On-the-go Commuters — together 54% of the
+  420 customer-survey respondents. Counted respondent by respondent, 31% of
+  the 300 price-sensitivity respondents call €2.39 too expensive. (An
+  earlier version of this note described the 54% as per-respondent and
+  "outright"; it is segment-level and includes the stretched segment.)
 - The unit-economics waterfall makes the channel gap concrete: at €2.39,
   Retail/Grocery keeps €0.74 per can against DTC Online's €1.35, because
   the retailer margin and distributor cut come off the top.
