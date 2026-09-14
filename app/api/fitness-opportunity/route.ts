@@ -5,14 +5,13 @@ import {
   isSupportedFitnessCity,
   type SupportedFitnessCity,
 } from "@/lib/fitness/cities";
-import { fetchFitnessLocationCount } from "@/lib/fitness/googlePlacesClient";
+import { fetchFitnessLocationSample } from "@/lib/fitness/googlePlacesClient";
 import {
-  classifyFitnessTier,
-  computeBenchmarkDensity,
-  computeDensityPer100k,
-  computeOpportunityIndex,
+  FITNESS_PLACE_TYPES,
+  PLACES_MAX_RESULTS_PER_SEARCH,
+  compareFitnessCities,
 } from "@/lib/fitness/opportunity";
-import type { FitnessOpportunityResponse } from "@/lib/fitness/types";
+import type { FitnessLocationSample, FitnessOpportunityResponse } from "@/lib/fitness/types";
 
 export const dynamic = "force-dynamic";
 
@@ -25,18 +24,20 @@ export const dynamic = "force-dynamic";
 // which is a known limitation of this simple approach.
 const CACHE_TTL_MS = 12 * 60 * 60 * 1000;
 
-type CacheEntry = { count: number; error: false; fetchedAt: number } | { error: true; fetchedAt: number };
+type CacheEntry =
+  | { sample: FitnessLocationSample; error: false; fetchedAt: number }
+  | { error: true; fetchedAt: number };
 const cityCache = new Map<SupportedFitnessCity, CacheEntry>();
 
-async function getCityCount(city: SupportedFitnessCity, apiKey: string): Promise<number | null> {
+async function getCitySample(city: SupportedFitnessCity, apiKey: string): Promise<FitnessLocationSample | null> {
   const cached = cityCache.get(city);
   if (cached && Date.now() - cached.fetchedAt < CACHE_TTL_MS) {
-    return cached.error ? null : cached.count;
+    return cached.error ? null : cached.sample;
   }
   try {
-    const count = await fetchFitnessLocationCount(city, apiKey);
-    cityCache.set(city, { count, error: false, fetchedAt: Date.now() });
-    return count;
+    const sample = await fetchFitnessLocationSample(city, apiKey);
+    cityCache.set(city, { sample, error: false, fetchedAt: Date.now() });
+    return sample;
   } catch {
     cityCache.set(city, { error: true, fetchedAt: Date.now() });
     return null;
@@ -63,43 +64,53 @@ export async function GET(request: NextRequest) {
   }
 
   const entries = await Promise.all(
-    SUPPORTED_FITNESS_CITIES.map(async (c) => ({ city: c, count: await getCityCount(c, apiKey) }))
+    SUPPORTED_FITNESS_CITIES.map(async (c) => ({ city: c, sample: await getCitySample(c, apiKey) }))
   );
 
-  const requested = entries.find((e) => e.city === city);
-  if (!requested || requested.count === null) {
+  const requested = entries.find((e) => e.city === city)?.sample ?? null;
+  if (!requested) {
     return NextResponse.json<FitnessOpportunityResponse>({
       available: false,
       reason: "api_error",
     });
   }
-  if (requested.count === 0) {
+  if (requested.locationCount === 0) {
     return NextResponse.json<FitnessOpportunityResponse>({
       available: false,
       reason: "empty_result",
     });
   }
 
-  const densityByCity = entries
-    .filter((e): e is { city: SupportedFitnessCity; count: number } => e.count !== null)
-    .map((e) => ({
-      city: e.city,
-      density: computeDensityPer100k(e.count, FITNESS_CITY_CONFIG[e.city].population),
-    }));
+  // Cities whose Places calls failed are left out of the comparison; cities
+  // with a capped count stay in it, and block the ranking for everyone.
+  const comparisonSet = entries
+    .filter((e): e is { city: SupportedFitnessCity; sample: FitnessLocationSample } => e.sample !== null)
+    .map((e) => ({ city: e.city, population: FITNESS_CITY_CONFIG[e.city].population, sample: e.sample }));
+  const comparison = compareFitnessCities(comparisonSet);
 
-  const benchmarkDensityPer100k = computeBenchmarkDensity(densityByCity.map((d) => d.density));
-  const densityPer100k = densityByCity.find((d) => d.city === city)!.density;
-  const opportunityIndex = computeOpportunityIndex(densityPer100k, benchmarkDensityPer100k);
-
-  return NextResponse.json<FitnessOpportunityResponse>({
-    available: true,
+  const base = {
+    available: true as const,
     city,
-    locationCount: requested.count,
+    locationCount: requested.locationCount,
     population: FITNESS_CITY_CONFIG[city].population,
-    densityPer100k,
-    benchmarkDensityPer100k,
-    opportunityIndex,
-    tier: classifyFitnessTier(opportunityIndex),
-    benchmarkCityCount: densityByCity.length,
+    capped: requested.cappedTypes.length > 0,
+    cappedTypes: requested.cappedTypes,
+    searchesPerCity: FITNESS_PLACE_TYPES.length,
+    maxResultsPerSearch: PLACES_MAX_RESULTS_PER_SEARCH,
+    comparisonCityCount: comparisonSet.length,
+    cappedCities: comparison.cappedCities,
+  };
+
+  if (!comparison.ranked) {
+    return NextResponse.json<FitnessOpportunityResponse>({
+      ...base,
+      ranked: false,
+      unrankedReason: comparison.reason,
+    });
+  }
+  return NextResponse.json<FitnessOpportunityResponse>({
+    ...base,
+    ranked: true,
+    ...comparison.rankings[city]!,
   });
 }
