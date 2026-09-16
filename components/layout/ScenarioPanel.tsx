@@ -191,9 +191,21 @@ export function AssumptionControls() {
           value={monthlyMarketingBudgetEur}
           onChange={(e) => setMonthlyMarketingBudgetEur(Number(e.target.value))}
           aria-valuetext={formatEuro(monthlyMarketingBudgetEur)}
+          aria-describedby="budget-note"
           style={rangeStyle(monthlyMarketingBudgetEur, BUDGET_MIN, BUDGET_MAX)}
           className="mt-1"
         />
+        {/* The model does not yet cap volume by marketing spend, so moving
+            this slider changes no figure on the page — said here, where
+            someone would move it, rather than only in PROMPTS.md. The spend
+            range is summed per month from marketing_funnel_monthly.csv. */}
+        <p id="budget-note" className="mt-1 text-xs text-foreground-faint text-pretty">
+          Not used by the estimates yet: the model does not limit volume by
+          marketing spend, so moving this changes no figure on the page. The
+          €15,000 default is a placeholder, not a number from the case data —
+          LUMEN&apos;s recorded spend in marketing_funnel_monthly.csv ran from
+          about €40k to €103k a month across its four channels.
+        </p>
       </div>
 
       <div className="flex items-center justify-between gap-3">
